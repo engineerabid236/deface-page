@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Ghost Rider | Cyber Elite</title>
+  <link rel="SHORTCUT ICON" href="https://i68.tinypic.com/65si9x.jpg" type="image/x-icon"/>
+  <link href='https://fonts.googleapis.com/css?family=Nosifer' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Iceland' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/css?family=Sarpanch:700" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Play" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      cursor: none; 
+    }
+
+    body {
+      background: #000000;
+      overflow-x: hidden; 
+      font-family: 'Play', sans-serif;
+      min-height: 100vh;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #000;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #00d4ff;
+      border-radius: 3px;
+    }
+
+    /* ========== অডিও কন্ট্রোল নিয়ন বাটন ========== */
+    .audio-control-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      background: rgba(0, 0, 0, 0.75);
+      color: #00d4ff;
+      border: 1px solid #00d4ff;
+      padding: 10px 18px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.8rem;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .audio-control-btn:hover {
+      background: #00d4ff;
+      color: #000;
+      box-shadow: 0 0 20px #00d4ff;
+      transform: scale(1.05);
+    }
+
+    /* ========== মাউস ব্রাইটনেস/গ্লো ওভারলে ইফেক্ট ========== */
+    .mouse-glow-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle 220px at var(--mouse-x, -500px) var(--mouse-y, -500px), 
+                                  rgba(0, 212, 255, 0.22) 0%, 
+                                  rgba(255, 0, 128, 0.12) 50%, 
+                                  rgba(0, 0, 0, 0) 100%);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* ========== কাস্টম মেইন কার্সার গলো ========== */
+    .custom-cursor {
+      position: fixed;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ffffff;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 10px #00d4ff, 0 0 20px #00d4ff;
+      opacity: 0;
+      transition: transform 0.1s ease;
+    }
+
+    .custom-cursor.hover {
+      transform: translate(-50%, -50%) scale(1.8);
+      background: #00d4ff;
+    }
+
+    #mainCyberCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .stars-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: radial-gradient(2px 2px at 20px 30px, #aaf, rgba(0,0,0,0)),
+                        radial-gradient(1px 1px at 70px 150px, #cff, rgba(0,0,0,0));
+      background-size: 200px 200px, 150px 150px;
+      background-repeat: repeat;
+      opacity: 0.15;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .content-wrapper {
+      position: relative;
+      z-index: 3;
+      text-align: center;
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 60px 15px;
+    }
+
+    h1 {
+      margin-top: 20px;
+      text-align: center;
+      color: #fff;
+      font-family: 'Nosifer', cursive;
+      text-shadow: 0 0 20px #00d4ff, 0 0 40px #0088ff;
+      font-size: 2rem;
+      padding: 0 15px;
+      letter-spacing: 2px;
+    }
+
+    @media (min-width: 768px) {
+      h1 { font-size: 3rem; letter-spacing: 4px; }
+    }
+
+    .avatar-container {
+      width: 180px;
+      height: 180px;
+      margin: 30px auto 15px auto;
+      border-radius: 50%;
+      border: 3px solid #00d4ff;
+      outline: 1px solid rgba(0, 212, 255, 0.5);
+      outline-offset: 3px;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(145deg, #0a0a2a, #0a0a1a);
+      transition: all 0.4s ease;
+      animation: borderGlow 2s ease-in-out infinite;
+    }
+
+    @keyframes borderGlow {
+      0%, 100% {
+        border-color: #00d4ff;
+        box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+      }
+      50% {
+        border-color: #00aaff;
+        box-shadow: 0 0 30px rgba(0, 170, 255, 0.7);
+      }
+    }
+
+    .avatar-container:hover {
+      transform: scale(1.03);
+      animation: none;
+      border-color: #55ddff;
+      box-shadow: 0 0 40px rgba(0, 212, 255, 0.9);
+    }
+
+    .avatar-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    @media (min-width: 768px) {
+      .avatar-container { width: 220px; height: 220px; }
+    }
+
+    .scramble-container {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+      padding: 0 15px;
+    }
+
+    .scramble-text {
+      font-size: 0.9rem;
+      color: #f0f0f0;
+      font-family: 'Iceland', monospace;
+      text-shadow: 0 0 5px #0ff;
+      text-align: center;
+      background: rgba(0,0,0,0.4);
+      padding: 12px 20px;
+      border-radius: 30px;
+      max-width: 90%;
+      line-height: 1.5;
+    }
+
+    @media (min-width: 768px) {
+      .scramble-text { font-size: 1.2rem; padding: 15px 30px; }
+    }
+
+    .dud { color: #666; }
+
+    .message {
+      color: #e0e0e0;
+      display: inline-block;
+      margin: 8px 0;
+      font-family: 'Sarpanch', sans-serif;
+      font-size: 0.85rem;
+      padding: 8px 20px;
+      background: rgba(20,20,40,0.7);
+      border-radius: 40px;
+      backdrop-filter: blur(3px);
+      border: 1px solid rgba(255,255,255,0.1);
+      transition: all 0.3s ease;
+    }
+
+    .message:hover {
+      transform: scale(1.05);
+      border-color: #00d4ff;
+      box-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+    }
+
+    @media (min-width: 768px) {
+      .message { font-size: 1rem; padding: 10px 25px; }
+    }
+
+    .section-title {
+      color: #00d4ff;
+      font-size: 1.2rem;
+      letter-spacing: 3px;
+      margin: 25px 0 10px;
+      font-family: 'Orbitron', monospace;
+    }
+
+    @media (min-width: 768px) {
+      .section-title { font-size: 1.5rem; }
+    }
+
+    .team-members {
+      color: #0ff;
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      background: rgba(0,0,0,0.5);
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 40px;
+      max-width: 95%;
+      transition: all 0.3s ease;
+    }
+
+    .team-members:hover {
+      transform: scale(1.02);
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+    }
+
+    @media (min-width: 768px) {
+      .team-members { font-size: 1rem; padding: 12px 25px; }
+    }
+
+    hr {
+      width: 60%;
+      margin: 30px auto;
+      border: none;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #00d4ff, #00d4ff, transparent);
+    }
+
+    .footer-note {
+      font-size: 0.6rem;
+      color: #6688aa;
+      margin-top: 10px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="stars-bg"></div>
+  
+  <canvas id="mainCyberCanvas"></canvas>
+  
+  <div class="mouse-glow-bg" id="mouseGlowBg"></div>
+  <div class="custom-cursor" id="customCursor"></div>
+
+  <button class="audio-control-btn" id="audioBtn" onclick="toggleAudio()">🔊 PLAY MUSIC</button>
+
+  <audio id="cyberAudio" loop>
+    <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3" type="audio/mpeg">
+  </audio>
+
+  <div class="content-wrapper">
+    <h1>HACKED BY GHOST RIDER</h1>
+    
+    <div class="avatar-container">
+      <img src="hacker.png" 
+           alt="Ghost Rider"
+           onerror="this.onerror=null; this.src='https://cdn.pixabay.com/photo/2015/12/09/18/24/hacker-1084780_640.png'">
+    </div>
+
+    <div class="scramble-container">
+      <div class="scramble-text" id="scrambleText"></div>
+    </div>
+
+    <div class="message">
+      ⚔️ We are elite hackers &nbsp;|&nbsp; <span style="color:#00d4ff;">We work hard.</span> &nbsp;|&nbsp; We Show No Mercy ⚔️
+    </div>
+    
+    <div class="message">
+      # Ghost Rider Domination • You've Been Hacked By <span style="color:#00d4ff;">GHOST RIDER - A Bangladeshi Cyber Team</span>
+    </div>
+    
+    <div class="section-title">⟡ WE ARE ⟡</div>
+    
+    <div class="team-members">
+      ⦿ Cyber-71 &nbsp;✦&nbsp; furn4ce &nbsp;✦&nbsp; Ghost Rider &nbsp;✦&nbsp; Sh4d0w Pr0x
+    </div>
+    
+    <hr>
+    
+    <div class="footer-note">
+      🛡️ EDUCATIONAL & RESEARCH PURPOSE ONLY | NO REAL SYSTEMS WERE HARMED 🛡️
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('mainCyberCanvas');
+    const ctx = canvas.getContext('2d');
+    const cursor = document.getElementById('customCursor');
+    const glowBg = document.getElementById('mouseGlowBg');
+    const audio = document.getElementById('cyberAudio');
+    const audioBtn = document.getElementById('audioBtn');
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+
+    // ========== ১. অডিও কন্ট্রোল ফাংশন ==========
+    audio.volume = 0.3; // ভলিউম হালকা ৩০% এ ফিক্সড রাখা হলো
+
+    function toggleAudio() {
+      if (audio.paused) {
+        audio.play()
+          .then(() => {
+            audioBtn.innerText = "🔇 PAUSE MUSIC";
+          })
+          .catch(error => {
+            console.log("Audio playback blocked or failed:", error);
+          });
+      } else {
+        audio.pause();
+        audioBtn.innerText = "🔊 PLAY MUSIC";
+      }
+    }
+
+    // বাটনে কার্সার হোভার ইফেক্ট
+    audioBtn.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+    audioBtn.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+
+
+    // ========== ২. ম্যাট্রিক্স ডাটা সেটআপ ==========
+    const matrixChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()GHOSTRIDER";
+    const matrixFontSize = 14;
+    let matrixColumns = Math.floor(canvas.width / matrixFontSize);
+    let matrixDrops = [];
+    
+    function initMatrixDrops() {
+      matrixColumns = Math.floor(canvas.width / matrixFontSize);
+      matrixDrops = [];
+      for (let i = 0; i < matrixColumns; i++) {
+        matrixDrops[i] = Math.random() * -100;
+      }
+    }
+    initMatrixDrops();
+
+    // ========== ৩. পার্টিক্যাল ক্লাস সেটআপ ==========
+    const particlesArray = [];
+    const colors = ['#00d4ff', '#ff007f', '#00ff41', '#9b5de5', '#ffffff']; 
+
+    class Particle {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.size = Math.random() * 4 + 1.5; 
+        this.speedX = (Math.random() - 0.5) * 2;
+        this.speedY = (Math.random() - 0.5) * 2;
+        this.color = colors[Math.floor(Math.random() * colors.length)];
+        this.alpha = 1;
+        this.decay = Math.random() * 0.006 + 0.005; 
+      }
+
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.alpha -= this.decay;
+        if (this.size > 0.2) this.size -= 0.01;
+      }
+
+      draw() {
+        ctx.save();
+        ctx.globalAlpha = this.alpha;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = this.color;
+        ctx.fillStyle = this.color;
+        
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    // ========== ৪. মাউস মুভমেন্ট লিসেনার ==========
+    document.addEventListener('mousemove', (e) => {
+      cursor.style.opacity = '1';
+      
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top = e.clientY + 'px';
+
+      glowBg.style.setProperty('--mouse-x', e.clientX + 'px');
+      glowBg.style.setProperty('--mouse-y', e.clientY + 'px');
+
+      for (let i = 0; i < 5; i++) {
+        particlesArray.push(new Particle(e.clientX, e.clientY));
+      }
+    });
+
+    // ========== ৫. কম্বাইন্ড একক অ্যানিমেশন লুপ ==========
+    function animate() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#00ff41'; 
+      ctx.font = matrixFontSize + 'px monospace';
+      
+      for (let i = 0; i < matrixDrops.length; i++) {
+        const text = matrixChars[Math.floor(Math.random() * matrixChars.length)];
+        const x = i * matrixFontSize;
+        const y = matrixDrops[i] * matrixFontSize;
+        
+        if (y > 0 && y < canvas.height) {
+          ctx.fillText(text, x, y);
+        }
+        
+        matrixDrops[i]++;
+        
+        if (matrixDrops[i] * matrixFontSize > canvas.height && Math.random() > 0.975) {
+          matrixDrops[i] = 0;
+        }
+      }
+
+      for (let i = 0; i < particlesArray.length; i++) {
+        particlesArray[i].update();
+        particlesArray[i].draw();
+
+        if (particlesArray[i].alpha <= 0) {
+          particlesArray.splice(i, 1);
+          i--;
+        }
+      }
+
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      initMatrixDrops();
+    });
+
+    // হোভার ইফেক্ট
+    const hoverElements = document.querySelectorAll('h1, .message, .team-members, .section-title, .avatar-container, .footer-note, .scramble-text');
+    hoverElements.forEach(el => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+    });
+
+    document.addEventListener('mouseleave', () => {
+      cursor.style.opacity = '0';
+      glowBg.style.setProperty('--mouse-x', '-500px');
+      glowBg.style.setProperty('--mouse-y', '-500px');
+    });
+
+
+    // ========== ৬. টেক্সট স্ক্র্যাম্বল ইফেক্ট ==========
+    class TextScramble {
+      constructor(el) {
+        this.el = el;
+        this.chars = '!<>-_\\/[]{}—=+*^?#________';
+        this.update = this.update.bind(this);
+      }
+      
+      setText(newText) {
+        const oldText = this.el.innerText;
+        const length = Math.max(oldText.length, newText.length);
+        const promise = new Promise((resolve) => this.resolve = resolve);
+        this.queue = [];
+        for (let i = 0; i < length; i++) {
+          const from = oldText[i] || '';
+          const to = newText[i] || '';
+          const start = Math.floor(Math.random() * 35);
+          const end = start + Math.floor(Math.random() * 35);
+          this.queue.push({ from, to, start, end });
+        }
+        cancelAnimationFrame(this.frameRequest);
+        this.frame = 0;
+        this.update();
+        return promise;
+      }
+      
+      update() {
+        let output = '';
+        let complete = 0;
+        for (let i = 0, n = this.queue.length; i < n; i++) {
+          let { from, to, start, end, char } = this.queue[i];
+          if (this.frame >= end) {
+            complete++;
+            output += to;
+          } else if (this.frame >= start) {
+            if (!char || Math.random() < 0.28) {
+              char = this.randomChar();
+              this.queue[i].char = char;
+            }
+            output += `<span class="dud">${char}</span>`;
+          } else {
+            output += from;
+          }
+        }
+        this.el.innerHTML = output;
+        if (complete === this.queue.length) {
+          this.resolve();
+        } else {
+          this.frameRequest = requestAnimationFrame(this.update);
+          this.frame++;
+        }
+      }
+      
+      randomChar() {
+        return this.chars[Math.floor(Math.random() * this.chars.length)];
+      }
+    }
+
+    const cyberPhrases = [
+      '> We are the ghosts in the machine. Invisible. Unstoppable.',
+      '> Your security is an illusion. We speak the language of 0s and 1s.',
+      '> We don\'t break the rules. We rewrite them.',
+      '> Code is our weapon. Anonymity is our shield.',
+      '> Fear the silent ones. We strike when you sleep.',
+      '> Your firewall is just a suggestion.',
+      '> Welcome to the dark side of the algorithm.',
+      '> We are everywhere. We are nowhere. We are Ghost Rider.'
+    ];
+
+    const scrambleElement = document.getElementById('scrambleText');
+    if (scrambleElement) {
+      const fx = new TextScramble(scrambleElement);
+      let idx = 0;
+      const runScramble = () => {
+        fx.setText(cyberPhrases[idx]).then(() => {
+          setTimeout(runScramble, 3200);
+        });
+        idx = (idx + 1) % cyberPhrases.length;
+      };
+      runScramble();
+    }
+  </script>
+</body>
+</html>
